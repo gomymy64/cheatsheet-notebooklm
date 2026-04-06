@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Материалы к Уроку Claude + NotebookLM | Мастодонт</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06060a;
+  --bg2: #0d0d14;
+  --bg3: #13131e;
+  --card: #0f0f18;
+  --border: #1a1a2e;
+  --border2: #252540;
+  --text: #e8e8f0;
+  --text2: #9595a8;
+  --text3: #5c5c72;
+  --accent1: #a855f7;
+  --accent2: #06b6d4;
+  --gradient1: linear-gradient(135deg, #a855f7, #06b6d4);
+  --gradient2: linear-gradient(135deg, #a855f7 0%, #7c3aed 30%, #06b6d4 70%, #22d3ee 100%);
+  --glow1: rgba(168, 85, 247, 0.15);
+  --glow2: rgba(6, 182, 212, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 800px 600px at 20% 10%, var(--glow1), transparent),
+    radial-gradient(ellipse 600px 800px at 80% 90%, var(--glow2), transparent),
+    radial-gradient(ellipse 400px 400px at 50% 50%, rgba(124, 58, 237, 0.05), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+::selection { background: var(--accent1); color: #fff; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent1), var(--accent2)); border-radius: 4px; }
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(6, 6, 10, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent 0%, var(--accent1) 30%, var(--accent2) 70%, transparent 100%) 1;
+  padding: 0 24px;
+}
+
+.nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+
+.nav-brand {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 3px;
+  background: var(--gradient1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+}
+
+.nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.nav-links a {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+  border-color: var(--border2);
+  background: var(--bg3);
+}
+
+/* HERO */
+.hero {
+  padding: 100px 0 80px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--accent2);
+  border: 1px solid var(--border2);
+  padding: 8px 20px;
+  border-radius: 100px;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 5.5vw, 56px);
+  line-height: 1.15;
+  margin-bottom: 20px;
+  background: var(--gradient2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: 17px;
+  color: var(--text2);
+  max-width: 560px;
+  margin: 0 auto 36px;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gradient1);
+  padding: 16px 36px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 30px var(--glow1);
+}
+
+.hero-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 40px var(--glow1); }
+
+/* SECTIONS */
+section { padding: 60px 0; }
+
+.section-title {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: clamp(20px, 3vw, 26px);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title .icon { font-size: 24px; }
+
+/* LEARN GRID */
+.learn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.learn-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.learn-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient1);
+}
+
+.learn-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.learn-card .lc-icon { font-size: 28px; margin-bottom: 12px; }
+.learn-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+/* TOOLS */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.tool-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: border-color 0.3s;
+}
+
+.tool-card:hover { border-color: var(--border2); }
+
+.tool-icon { font-size: 32px; flex-shrink: 0; line-height: 1; }
+
+.tool-info h3 { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.tool-info p { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+
+.tool-link {
+  font-size: 11px;
+  color: var(--accent2);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.tool-link:hover { opacity: 0.7; }
+
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-free { background: rgba(6, 182, 212, 0.12); color: var(--accent2); }
+.badge-paid { background: rgba(168, 85, 247, 0.12); color: var(--accent1); }
+
+/* STEP CARDS */
+.step-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient1);
+}
+
+.step-card::after {
+  content: attr(data-step);
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: clamp(64px, 10vw, 96px);
+  opacity: 0.03;
+  line-height: 1;
+  background: var(--gradient1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  pointer-events: none;
+}
+
+.step-card:hover { border-color: var(--border2); }
+
+.step-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--accent1);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.step-card h3 {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 2.5vw, 20px);
+  margin-bottom: 12px;
+}
+
+.step-card .desc {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 20px;
+  max-width: 680px;
+}
+
+.action-list { list-style: none; margin-bottom: 20px; }
+
+.action-list li {
+  font-size: 14px;
+  padding: 6px 0;
+  padding-left: 20px;
+  position: relative;
+  color: var(--text);
+}
+
+.action-list li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+/* PROMPT BLOCK */
+.prompt-block {
+  background: rgba(168, 85, 247, 0.04);
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-left: 3px solid;
+  border-image: var(--gradient1) 1;
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin: 16px 0;
+  position: relative;
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.04);
+}
+
+.prompt-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent1);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prompt-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  color: var(--accent1);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.copy-btn:hover { background: rgba(168, 85, 247, 0.2); }
+
+.copy-btn.copied {
+  background: var(--accent1);
+  color: #fff;
+  border-color: var(--accent1);
+}
+
+.step-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(6, 182, 212, 0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(6, 182, 212, 0.08);
+}
+
+.step-tip .tip-icon { flex-shrink: 0; }
+
+.step-settings {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 12px;
+  padding-left: 4px;
+}
+
+/* LINKS SECTION */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.link-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.3s;
+}
+
+.link-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+
+.link-card .link-icon { font-size: 28px; flex-shrink: 0; }
+.link-card .link-name { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 600; }
+.link-card .link-desc { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* CTA */
+.cta-section { padding: 60px 0 40px; }
+
+.cta-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px clamp(24px, 8vw, 100px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  box-shadow: 0 0 60px var(--glow1);
+  animation: ctaGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes ctaGlow {
+  0% { box-shadow: 0 0 40px var(--glow1); }
+  100% { box-shadow: 0 0 80px var(--glow1), 0 0 40px var(--glow2); }
+}
+
+.cta-text {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: clamp(16px, 2.5vw, 22px);
+  line-height: 1.4;
+}
+
+.cta-text .grad {
+  background: var(--gradient1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gradient1);
+  padding: 18px 40px;
+  border-radius: 100px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.3s, box-shadow 0.3s;
+  flex-shrink: 0;
+}
+
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--glow1); }
+
+/* FOOTER */
+footer {
+  padding: 40px 24px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-brand {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 3px;
+  background: var(--gradient1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+footer .footer-sub { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+
+.footer-yt {
+  display: inline-block;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent2);
+  text-decoration: none;
+  padding: 8px 20px;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  transition: all 0.3s;
+}
+
+.footer-yt:hover { border-color: var(--accent2); background: rgba(6, 182, 212, 0.06); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { padding: 72px 0 56px; }
+  .step-card { padding: 28px 20px; }
+  .step-card::after { font-size: 56px; right: 16px; }
+  .cta-card { flex-direction: column; text-align: center; padding: 36px 24px; }
+  .prompt-block { padding: 16px 18px 16px 20px; }
+  .copy-btn { position: static; margin-top: 12px; display: inline-block; }
+}
+
+@media (min-width: 2560px) {
+  .container { max-width: 1000px; }
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+.d1 { animation-delay: 0.1s; }
+.d2 { animation-delay: 0.2s; }
+.d3 { animation-delay: 0.3s; }
+.d4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="https://aimastodont.com/" target="_blank" class="nav-brand">МАСТОДОНТ</a>
+    <div class="nav-links">
+      <a href="#tools">Инструменты</a>
+      <a href="#steps">Шаги</a>
+      <a href="#links">Ссылки</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge animate">МАТЕРИАЛЫ К УРОКУ</div>
+    <h1 class="animate d1">Claude + NotebookLM = Бесконечная Память</h1>
+    <p class="animate d2">Подключи NotebookLM к Claude - получи вечную память, бесплатную генерацию контента и глубокий ресерч без сжигания токенов</p>
+  </section>
+
+  <!-- LEARN -->
+  <section>
+    <div class="section-title"><span class="icon">📋</span> Что ты научишься делать</div>
+    <div class="learn-grid">
+      <div class="learn-card animate">
+        <div class="lc-icon">🔗</div>
+        <p>Подключить NotebookLM к Claude Code и Claude Cowork</p>
+      </div>
+      <div class="learn-card animate d1">
+        <div class="lc-icon">🔬</div>
+        <p>Делать глубокий ресерч через 70+ источников одним запросом</p>
+      </div>
+      <div class="learn-card animate d2">
+        <div class="lc-icon">🎨</div>
+        <p>Генерировать инфографики, видео, подкасты - бесплатно</p>
+      </div>
+      <div class="learn-card animate d3">
+        <div class="lc-icon">🧠</div>
+        <p>Настроить вечную память для Claude через систему "Мозг"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools">
+    <div class="section-title"><span class="icon">🛠️</span> Что понадобится</div>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-icon">📓</div>
+        <div class="tool-info">
+          <h3>NotebookLM</h3>
+          <p>RAG-память, ресерч, генерация контента</p>
+          <span class="badge badge-free">бесплатно</span><br>
+          <a class="tool-link" href="https://notebooklm.google.com" target="_blank">notebooklm.google.com</a>
+        </div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">⬛</div>
+        <div class="tool-info">
+          <h3>Claude Code</h3>
+          <p>Терминальный клиент, установка MCP</p>
+          <span class="badge badge-paid">подписка</span><br>
+          <a class="tool-link" href="https://claude.ai" target="_blank">claude.ai</a>
+        </div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">💎</div>
+        <div class="tool-info">
+          <h3>Claude Cowork</h3>
+          <p>Браузерный Claude с проектами и скиллами</p>
+          <span class="badge badge-paid">подписка</span><br>
+          <a class="tool-link" href="https://claude.ai" target="_blank">claude.ai</a>
+        </div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon">📦</div>
+        <div class="tool-info">
+          <h3>Скиллы (2 файла)</h3>
+          <p>NotebookLM скилл + Wrap-up скилл</p>
+          <span class="badge badge-free">бесплатно</span><br>
+          <a class="tool-link" href="https://drive.google.com/drive/folders/15fjCqJlBQ8mypp-04tBGmcdwU9vGYMny" target="_blank">Скачать из Google Drive</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEPS -->
+  <section id="steps">
+    <div class="section-title"><span class="icon">📌</span> Пошаговая инструкция</div>
+
+    <!-- STEP 1 -->
+    <div class="step-card" data-step="01">
+      <div class="step-label">Шаг 1</div>
+      <h3>Установка скилла в Claude Code</h3>
+      <p class="desc">Скачай файл скилла NotebookLM из папки с ресурсами. Открой Claude Code, перетащи файл в рабочую область.</p>
+      <ul class="action-list">
+        <li>Перетащи файл .md в окно Claude Code</li>
+        <li>Напиши промпт и нажми Enter</li>
+        <li>Claude сам скачает скрипты, установит все и настроит подключение</li>
+        <li>Разрешай выполнение команд когда попросит (Yes/Allow)</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт</div>
+        <div class="prompt-text">Выполни этот скилл</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'Выполни этот скилл')">Скопировать</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card" data-step="02">
+      <div class="step-label">Шаг 2</div>
+      <h3>Авторизация в NotebookLM</h3>
+      <p class="desc">Claude Code откроет браузер - тебе нужно залогиниться в Google.</p>
+      <ul class="action-list">
+        <li>В открывшемся браузере войди в свой Google-аккаунт</li>
+        <li>Перейди на notebooklm.google.com</li>
+        <li>Убедись что видишь свои ноутбуки</li>
+        <li>Вернись в Claude Code и напиши что залогинился</li>
+      </ul>
+      <div class="step-settings">⚙️ Если браузер не открылся - набери в терминале: <code>nlm login</code></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card" data-step="03">
+      <div class="step-label">Шаг 3</div>
+      <h3>Проверка подключения</h3>
+      <p class="desc">Убедись что Claude видит твои ноутбуки.</p>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт</div>
+        <div class="prompt-text">Покажи заголовки моих последних трёх ноутбуков</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'Покажи заголовки моих последних трёх ноутбуков')">Скопировать</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card" data-step="04">
+      <div class="step-label">Шаг 4</div>
+      <h3>Подключение к Claude Cowork</h3>
+      <p class="desc">Теперь делаем так чтобы NotebookLM работал и в браузерном Claude.</p>
+      <ul class="action-list">
+        <li>В Claude Code напиши промпт - он сгенерирует файл скилла и сохранит на рабочий стол</li>
+        <li>Открой Claude Cowork в браузере</li>
+        <li>Нажми <strong>+</strong> внизу слева → <strong>Skills</strong> → <strong>Manage Skills</strong> → <strong>Upload a skill</strong></li>
+        <li>Загрузи файл с рабочего стола</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт (в Claude Code)</div>
+        <div class="prompt-text">Добавь NotebookLM как скилл для Co-work</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'Добавь NotebookLM как скилл для Co-work')">Скопировать</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card" data-step="05">
+      <div class="step-label">Шаг 5</div>
+      <h3>Глубокий ресерч (Enrichment)</h3>
+      <p class="desc">Самая мощная фишка - Claude уходит в NotebookLM, загружает десятки источников и возвращает только выжимку. Ты не тратишь токены на обработку.</p>
+      <ul class="action-list">
+        <li>Открой проект в Claude Cowork (или Claude Code)</li>
+        <li>Напиши промпт</li>
+        <li>Подожди пока Claude создаст ноутбук и проанализирует данные</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт</div>
+        <div class="prompt-text">Создай новый ноутбук на основе всего что ты знаешь обо мне и этом разговоре, плюс весь контекст проекта. После этого дай мне 10 выжимок и 3 действия которые нужно сделать прямо сейчас</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'Создай новый ноутбук на основе всего что ты знаешь обо мне и этом разговоре, плюс весь контекст проекта. После этого дай мне 10 выжимок и 3 действия которые нужно сделать прямо сейчас')">Скопировать</button>
+      </div>
+      <div class="step-tip">
+        <span class="tip-icon">💡</span>
+        <span>Если deep research таймаутит - спроси: "Ты импортировал все результаты deep research?"</span>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-card" data-step="06">
+      <div class="step-label">Шаг 6</div>
+      <h3>Генерация ассетов (инфографики, видео, подкасты)</h3>
+      <p class="desc">NotebookLM умеет бесплатно генерировать визуальный контент. Claude просто отправляет запрос и скачивает результат.</p>
+      <ul class="action-list">
+        <li>Напиши промпт после любого обсуждения</li>
+        <li>Подожди генерацию</li>
+        <li>Claude скачает готовый файл</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт</div>
+        <div class="prompt-text">Создай инфографику в NotebookLM по этим выжимкам - красивые цвета, премиум шрифты, и скачай мне</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'Создай инфографику в NotebookLM по этим выжимкам - красивые цвета, премиум шрифты, и скачай мне')">Скопировать</button>
+      </div>
+      <div class="step-settings">⚙️ Доступные форматы: инфографики, видео, подкасты, презентации, mind map, quiz, flashcards</div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step-card" data-step="07">
+      <div class="step-label">Шаг 7</div>
+      <h3>Настройка вечной памяти (Wrap-up)</h3>
+      <p class="desc">После каждой большой сессии Claude сохраняет все важное в специальный ноутбук "Мозг" в NotebookLM.</p>
+      <ul class="action-list">
+        <li>Скачай файл "Wrap-up скилл" из папки с ресурсами</li>
+        <li>Загрузи его в Cowork: <strong>+</strong> → <strong>Skills</strong> → <strong>Manage Skills</strong> → <strong>Upload</strong></li>
+        <li>В конце любой большой сессии напиши промпт</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Промпт</div>
+        <div class="prompt-text">/wrap-up</div>
+        <button class="copy-btn" onclick="copyPrompt(this, '/wrap-up')">Скопировать</button>
+      </div>
+      <div class="step-tip">
+        <span class="tip-icon">💡</span>
+        <span>Система сама создаст ноутбук "Мозг" (если его нет) и сохранит туда саммари сессии</span>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step-card" data-step="08">
+      <div class="step-label">Шаг 8</div>
+      <h3>Автоконсультация с "Мозгом"</h3>
+      <p class="desc">Сделай так чтобы Claude автоматически обращался к твоей базе знаний при каждом вопросе.</p>
+      <ul class="action-list">
+        <li>Открой настройки проекта в Cowork (Instructions справа)</li>
+        <li>Добавь строчку из промпта ниже</li>
+        <li>Сохрани - теперь Claude сам ищет ответы в твоей базе одним запросом</li>
+      </ul>
+      <div class="prompt-block">
+        <div class="prompt-label">💬 Инструкция для проекта</div>
+        <div class="prompt-text">При ответах на вопросы о стратегии всегда консультируйся с ноутбуком "AI Brain" в NotebookLM</div>
+        <button class="copy-btn" onclick="copyPrompt(this, 'При ответах на вопросы о стратегии всегда консультируйся с ноутбуком &quot;AI Brain&quot; в NotebookLM')">Скопировать</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINKS -->
+  <section id="links">
+    <div class="section-title"><span class="icon">🔗</span> Все ссылки</div>
+    <div class="links-grid">
+      <a class="link-card" href="https://notebooklm.google.com" target="_blank">
+        <div class="link-icon">📓</div>
+        <div>
+          <div class="link-name">NotebookLM</div>
+          <div class="link-desc">Платформа от Google - бесплатно</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://claude.ai" target="_blank">
+        <div class="link-icon">🤖</div>
+        <div>
+          <div class="link-name">Claude</div>
+          <div class="link-desc">Code и Cowork - по подписке</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://drive.google.com/drive/folders/15fjCqJlBQ8mypp-04tBGmcdwU9vGYMny" target="_blank">
+        <div class="link-icon">📦</div>
+        <div>
+          <div class="link-name">Скиллы и ресурсы</div>
+          <div class="link-desc">Google Drive - бесплатно</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <div class="cta-text">Пошаговый план по&nbsp;выходу<br>на&nbsp;первые <span class="grad">100к в&nbsp;ИИ</span> в&nbsp;2026</div>
+      <a class="cta-btn" href="https://t.me/mastodont_aibot?start=agency" target="_blank">Забрать</a>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="https://aimastodont.com/" target="_blank" class="footer-brand">МАСТОДОНТ</a>
+  <p class="footer-sub">AI и нейросети - просто, по делу</p>
+  <a href="https://www.youtube.com/@aiBoomb" target="_blank" class="footer-yt">YouTube: @aiBoomb</a>
+</footer>
+
+<script>
+function copyPrompt(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Скопировано!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Скопировать';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Intersection Observer for animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationPlayState = 'running';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.animate').forEach(el => {
+  el.style.animationPlayState = 'paused';
+  observer.observe(el);
+});
+
+// Nav active state
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.style.color = '');
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if (link) link.style.color = 'var(--accent2)';
+    }
+  });
+}, { threshold: 0.2, rootMargin: '-64px 0px -60% 0px' });
+
+sections.forEach(s => navObserver.observe(s));
+</script>
+
+</body>
+</html>
